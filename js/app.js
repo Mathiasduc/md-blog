@@ -17,7 +17,7 @@
 		},
 
 		requestAjax: function(){
-			var jsonRequest = $.ajax("http://192.168.1.107:8080/menu.json")
+			var jsonRequest = $.ajax("http://192.168.0.50:8080/menu.json")
 			.done(function(){
 				app.getArticles(jsonRequest.responseJSON.menu);
 			})
@@ -27,7 +27,7 @@
 		getArticles: function(menu){
 			var len = menu.length;
 			for(var i = 0; i < len; i++){
-				var url = "http://192.168.1.107:8080" + menu[i].path;
+				var url = "http://192.168.0.50:8080" + menu[i].path;
 				var title = menu[i].title;
 				var anchorArticle = "<a class='item' data-url='" + url + "'>" + title + "</a>";
 				app.selectorArticles.append(anchorArticle);
