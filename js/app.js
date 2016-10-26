@@ -6,8 +6,8 @@
 		selectorArticles: $("#articles"),
 
 		init:function(){
-			app.requestAjax();
-			app.listeners();
+			this.requestAjax(); // Privilégie this plutôt que le nom de ton objet global.
+			this.listeners();
 		},
 
 		listeners: function(){
@@ -21,9 +21,11 @@
 			.done(function(){
 				app.getArticles(jsonRequest.responseJSON.menu);
 			})
-			.fail(console.log("fail"));
+			//.fail(console.log("fail"));// Nope ! Fail prend une function en argument.
+			.fail(function(){
+				//blalala
+			});
 		},
-
 		getArticles: function(menu){
 			var len = menu.length;
 			for(var i = 0; i < len; i++){
@@ -41,6 +43,7 @@
 				var convertedToHtml = converter.makeHtml(mdRequest.responseText);
 				app.selectorMD.html(convertedToHtml);
 			})
+			// IDEM
 			.fail(console.log("fail displayMd")); //demander pk tjrs vrai
 		},
 	};
