@@ -6,7 +6,7 @@
 		selectorArticles: $("#articles"),
 
 		init:function(){
-			app.requestAjax();
+			app.requestJson();
 			app.listeners();
 		},
 
@@ -16,12 +16,13 @@
 			});
 		},
 
-		requestAjax: function(){
+		requestJson: function(){
+			var me = this;	
 			var jsonRequest = $.ajax("http://192.168.1.107:8080/menu.json")
 			.done(function(){
-				app.getArticles(jsonRequest.responseJSON.menu);
+				me.getArticles(jsonRequest.responseJSON.menu);
 			})
-			.fail(console.log("fail"));
+			.fail(app.errorAjax);
 		},
 
 		getArticles: function(menu){
@@ -41,8 +42,10 @@
 				var convertedToHtml = converter.makeHtml(mdRequest.responseText);
 				app.selectorMD.html(convertedToHtml);
 			})
-			.fail(console.log("fail displayMd")); //demander pk tjrs vrai
+			.fail(app.errorAjax);
 		},
+
+		errorAjax: function(){console.log("In fail method, something went wrong");},
 	};
 
 	$(document).ready(function(){
