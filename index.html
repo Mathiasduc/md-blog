@@ -3,23 +3,46 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Markdown Blog</title>
-	<link rel="stylesheet" href="/node_modules/semantic-ui-css/semantic.css">
+	<link rel="stylesheet" href="/node_modules/semantic-ui/dist/semantic.css">
 	<link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 	<div id="app">
-		<div id="articles" class="ui pointing menu">
-			<a class="item active" data-type="edit" data-url="http://192.168.0.26:8080/edit-form.html">
-				Edit articles
-			</a>	
+
+		<div id="global-menu" class="ui menu">
+			<div id="admin" class="menu">
+				<a class="item" data-type="edit" data-url="http://192.168.0.26:8080/edit-form.html">
+					Create an article!
+				</a>
+				<a class="item" data-type="edit" data-url="http://192.168.0.26:8080/edit-form.html">
+					Edit an article!
+				</a>
+				<div class="ui dropdown item">
+					Messages
+					<i class="dropdown icon"></i>
+					<div class="menu">
+						<div class="item">
+							<i class="dropdown icon"></i>
+							<span class="text">Categories</span>
+							<div class="menu">
+								<div class="item">Unread</div>
+								<div class="item">Promotions</div>
+								<div class="item">Updates</div>
+							</div>
+						</div>
+						<div class="item">Archive</div>
+					</div>
+				</div>	
+			</div>
+			<div id="articles" class="right aligned ui menu">
+				<div class="item">Last articles :</div>
+			</div>
 		</div>
-		<div id="md" class="ui segment" >
-			Click to display an article
-		</div>
+		<div id="md" class="ui segment">Click to display an article</div>
 	</div>
 	<script src="/node_modules/jquery/dist/jquery.js"></script>
-	<script src="/node_modules/semantic-ui-css/semantic.css"></script>
 	<script src="/node_modules/showdown/dist/showdown.js"></script>
+	<script src="/node_modules/semantic-ui/dist/semantic.js"></script>
 	<script src="/js/app.js"></script>
 </body>
 </html>

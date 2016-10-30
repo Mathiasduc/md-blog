@@ -28,10 +28,10 @@ app.get('/', function(req, res){
     res.sendFile('index.html', {root: __dirname + "/ressources"} );
 });
 
-app.post('/ressources/new/:article',jsonParser, function (req, res) {
+app.post('/ressources',jsonParser, function (req, res) {
 	if (!req.body) {return res.sendStatus(400);}
 	console.log(req.body);
-	fs.writeFile(ressourcesPath + req.body.path,req.body.article,'utf8','wx',(err) => {
+	fs.writeFile(ressourcesPath + req.body.path, req.body.article, 'utf8','wx',(err) => {
 		if(err){
 			console.log(err);
 		}else{

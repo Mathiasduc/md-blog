@@ -1,4 +1,14 @@
+#global-menu{
+	max-width: 90%;
+	margin: auto;
+}
 #md {
 	max-width: 85%;
 	margin: auto;
+}
+#articles{
+	overflow: hidden;
+}
+#admin{
+	margin-right: 65px;
 }

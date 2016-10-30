@@ -20,6 +20,7 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "jquery": "^3.1.1",
+    "semantic-ui": "^2.2.6",
     "semantic-ui-css": "^2.2.4",
     "showdown": "^1.4.3"
   }

@@ -1,10 +1,14 @@
 <div id="global">	
-	<form action="">
-		<input id="title" type="text" placeholder="Saisissez un titre d'article">
-		<input id="toDisplay" type="hidden">
-		<div>	
-			<textarea id="textarea" rows="30" cols="50" placeholder="Editez ou saisissez un article"></textarea>
+	<div  id="form-new" class="ui form">
+		<div class="field">
+			<label>Title</label>
+			<input id="title" name="title" type="text" placeholder="max 25 char.">
 		</div>
-		<input id="form-sub" type="submit" value="Enregistrer">
-	</form>
+		<div class="field">
+			<label>Text</label>
+			<textarea id="text-article" name="text-article" rows="20" type="text" placeholder="Use markdown syntax for better lisibility."></textarea>
+		</div>
+		<div id="form-sub" class="ui primary submit button">Create new article</div>
+		<div class="ui error message"></div>
+	</div>
 </div>
