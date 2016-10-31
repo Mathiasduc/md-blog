@@ -17,16 +17,17 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-/*app.use(jsonParser);*/
+/*app.use((req,res,next)=>{console.log("req");next();});*/
 
 app.use(function(err, req, res, next) {
 	console.error(err.stack);
-	res.status(500).send('Something broke!');
+	res.status(500).send('\nSomething broke!');
 });
 
-app.get('/', function(req, res){
+/*app.get('/', function(req, res){
+	console.log("test");
     res.sendFile('index.html', {root: __dirname + "/ressources"} );
-});
+});*/
 
 app.post('/ressources',jsonParser, function (req, res) {
 	if (!req.body) {return res.sendStatus(400);}
@@ -40,7 +41,5 @@ app.post('/ressources',jsonParser, function (req, res) {
 		}
 	});
 });
-
-
 
 app.listen(8080);

@@ -9,16 +9,20 @@
 <body>
 	<div id="app">
 
-		<div id="global-menu" class="ui menu">
-			<div id="admin" class="menu">
-				<a class="item" data-type="edit" data-url="http://192.168.0.26:8080/edit-form.html">
+		<div id="global-menu" class="ui pointing menu">
+			<div id="admin" class="pointing menu">
+				<a class="item" data-type="form" data-url="http://88.160.12.89:8080/new-form.html">
 					Create an article!
 				</a>
-				<a class="item" data-type="edit" data-url="http://192.168.0.26:8080/edit-form.html">
-					Edit an article!
-				</a>
+				<select id="edit-drop" class="ui search dropdown item">
+					<option value="">Edit an article</option>
+				</select>
+				<div data-url="http://88.160.12.89:8080/edit-form.html" id="edit-button" class="ui icon teal button">
+					 <i class="edit icon"></i>
+					 Edit
+				</div>
 				<div class="ui dropdown item">
-					Messages
+					Select Article
 					<i class="dropdown icon"></i>
 					<div class="menu">
 						<div class="item">
@@ -34,8 +38,7 @@
 					</div>
 				</div>	
 			</div>
-			<div id="articles" class="right aligned ui menu">
-				<div class="item">Last articles :</div>
+			<div id="articles" class="right aligned pointing menu">
 			</div>
 		</div>
 		<div id="md" class="ui segment">Click to display an article</div>

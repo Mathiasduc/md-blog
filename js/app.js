@@ -2,9 +2,10 @@
 	"use strict";
 	var app = {
 
-		localurl: "http://192.168.0.26:8080",
+		localurl: "http://88.160.12.89:8080",
 		selectorMD: $("#md"),
 		selectorArticles: $("#articles"),
+		selectorDrop: $("#edit-drop"),
 
 		init:function(){
 			this.requestJson(this.getArticles);
@@ -15,16 +16,31 @@
 		listeners: function(){
 			var me = this;
 			$("#global-menu").on("click", "a", function(){
-				if($(this).data("type") === "edit"){
-					me.display($(this).data("url"), false);		
+				$("a").removeClass("active");
+				$(this).addClass("active");
+				if($(this).data("type") === "form"){
+					me.display($(this).data("url"), false);
 				}else{
 					me.display($(this).data("url"), true);
+				}
+			});
+
+			$("#edit-button").on("click", function(){
+				var formUrl = $(this).data("url");
+				var urlToEdit = $(".search.dropdown .selected").data("value")
+				if(urlToEdit){
+					console.log(urlToEdit);
+					me.display(formUrl, false, urlToEdit);
 				}
 			});
 
 			$("#md").on("click", "#form-sub", function(event){
 				event.preventDefault();
 				me.newArticle(event);
+			});
+
+			$("#md").on("click", "#sub-edit", function(event){
+				event.preventDefault();
 			});
 		},
 
@@ -46,54 +62,71 @@
 		getArticles: function(menu){
 			this.selectorArticles.html();
 			var len = menu.length;
+			var last ='<div class="item">Last articles :</div>'
 			for(var i = 0; i < len; i++){
 				var url = this.localurl + menu[i].path;
 				var title = menu[i].title;
-				var anchorArticle = "<a class='item' data-url='" + url + "'>" + title + "</a>";
-				app.selectorArticles.append(anchorArticle);
+				var anchorArticle = "<a class='item link' data-url='" + url + "'>" + title + "</a>";
+				var dropArticle = '<option value="'+url+'">'+title+'</option>';
+				this.selectorDrop.append(dropArticle);
+				this.selectorArticles.append(anchorArticle);
 			}
+			this.selectorArticles.prepend(last);
 		},
 
-		display: function(url, isMarkdown){
+		display: function(url, isMarkdown, urlToEdit){
+			var me = this;
 			var converter = new showdown.Converter();
 			var jqXHR = $.ajax(url)
 			.done(function(){
 				if(isMarkdown === true){
 					var convertedToHtml = converter.makeHtml(jqXHR.responseText);
-					app.selectorMD.html(convertedToHtml);
+					me.selectorMD.html(convertedToHtml);
 				}else{
-					app.selectorMD.html(jqXHR.responseText);
-					app.semanticSettings();
+					me.selectorMD.html(jqXHR.responseText);
+					me.getFormValue(urlToEdit);
+					me.semanticSettings();
 				}
 			})
-			.fail(app.errorAjax);
+			.fail(me.errorAjax);
 		},
 
 		newArticle: function(event){
 			var me = this;
-			var $form = $('#form-new');
-			var title =  $form.form('get value', 'title');
-			console.log(title);
+			var $form = $('#form-new')
 			console.log($('#form-new').form('is valid'));
-		
-		/*	var titleArticle = $("#title").val();
-			var contentMd = $("#text-article").val();
-			var urlTitle = this.localurl + "/ressources";
-			
+			if ($form.form('is valid')){
+				var $form = $('#form-new');
+				var titleArticle =  $form.form('get value', 'title');
+				var contentMd = $form.form('get value', 'text-article');
+				var urlTitle = this.localurl + "/ressources";
 
-			var postForm = $.ajax({
-				method: "POST",
-				url: urlTitle,
-				data: {article: contentMd, title: titleArticle, path: '/' + titleArticle + ".md" },
-				success: function(){
-					me.greatSuccess(postForm);
-				},
-			});*/
+				var postForm = $.ajax({
+					method: "POST",
+					url: urlTitle,
+					data: {article: contentMd, title: titleArticle, path: '/' + titleArticle + ".md" },
+					success: function(){
+						me.greatSuccess(postForm);
+						me.requestJson(me.getArticles);
+					},
+				});
+			}
+		},
+
+		getFormValue: function(urlToEdit){
+			var me = this;
+			if ($("#form-edit")[0]){
+				var jqXHR = $.ajax(urlToEdit)
+				.done(function(data){
+					$("#text-article").val(data);
+				})
+				.fail(me.errorAjax);
+			}
 		},
 
 		semanticSettings: function(){
 			$('.ui.dropdown').dropdown();
-			$('#form-new')
+			$('.form')
 			.form({
 				fields: {
 					title: {
