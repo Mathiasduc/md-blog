@@ -11,29 +11,20 @@
 
 		<div id="global-menu" class="ui pointing menu">
 			<div id="admin" class="pointing menu">
-				<a class="item" data-type="form" data-url="http://88.160.12.89:8080/new-form.html">
+				<a class="item" data-type="form" data-url="http://192.168.1.107:8080/new-form.html">
 					Create an article!
 				</a>
 				<select id="edit-drop" class="ui search dropdown item">
 					<option value="">Edit an article</option>
 				</select>
-				<div data-url="http://88.160.12.89:8080/edit-form.html" id="edit-button" class="ui icon teal button">
+				<div data-url="http://192.168.1.107:8080/edit-form.html" id="edit-button" class="ui icon teal button">
 					 <i class="edit icon"></i>
 					 Edit
 				</div>
 				<div class="ui dropdown item">
 					Select Article
 					<i class="dropdown icon"></i>
-					<div class="menu">
-						<div class="item">
-							<i class="dropdown icon"></i>
-							<span class="text">Categories</span>
-							<div class="menu">
-								<div class="item">Unread</div>
-								<div class="item">Promotions</div>
-								<div class="item">Updates</div>
-							</div>
-						</div>
+					<div id="drop-list" class="menu">
 						<div class="item">Archive</div>
 					</div>
 				</div>	

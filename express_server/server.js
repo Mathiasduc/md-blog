@@ -3,7 +3,6 @@ var bodyParser = require('body-parser');
 var fs = require('fs');
 var meth = require('./methods.js');
 
-/*var updateJson = meth.updateJson();*/
 var jsonParser = bodyParser.json();
 var textParser = bodyParser.text();
 var ressourcesPath = __dirname + '/ressources';
@@ -17,17 +16,15 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-/*app.use((req,res,next)=>{console.log("req");next();});*/
-
 app.use(function(err, req, res, next) {
 	console.error(err.stack);
 	res.status(500).send('\nSomething broke!');
 });
 
-/*app.get('/', function(req, res){
+app.get('/', function(req, res){
 	console.log("test");
-    res.sendFile('index.html', {root: __dirname + "/ressources"} );
-});*/
+    res.sendFile('index.html');
+});
 
 app.post('/ressources',jsonParser, function (req, res) {
 	if (!req.body) {return res.sendStatus(400);}
@@ -36,7 +33,7 @@ app.post('/ressources',jsonParser, function (req, res) {
 		if(err){
 			console.log(err);
 		}else{
-			meth.updateJson(req.body.title, req.body.path);
+			meth.updateJson(req.body.title, req.body.path, req.body.articleToEdit);
 			res.sendStatus(200);
 		}
 	});

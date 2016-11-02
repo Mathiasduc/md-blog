@@ -2,16 +2,21 @@
 	"use strict";
 	var app = {
 
-		localurl: "http://88.160.12.89:8080",
+		localurl: "http://192.168.1.107:8080",
 		selectorMD: $("#md"),
 		selectorArticles: $("#articles"),
 		selectorDrop: $("#edit-drop"),
+		selectorDropList: $("#drop-list"),
 
 		init:function(){
 			this.requestJson(this.getArticles);
 			this.listeners();
 			this.semanticSettings();
 		},
+
+		//UN SLUG!!!<<<<-----------------------
+		//verif si bel et bien eu modif avant de post?
+		//delete un article
 
 		listeners: function(){
 			var me = this;
@@ -27,54 +32,65 @@
 
 			$("#edit-button").on("click", function(){
 				var formUrl = $(this).data("url");
-				var urlToEdit = $(".search.dropdown .selected").data("value")
-				if(urlToEdit){
-					console.log(urlToEdit);
-					me.display(formUrl, false, urlToEdit);
+				var articleToEdit = $(".search.dropdown .selected").data("value")
+				if(articleToEdit){
+					me.display(formUrl, false, articleToEdit);
 				}
 			});
 
-			$("#md").on("click", "#form-sub", function(event){
+			$("#md").on("click", "#sub", function(event){
 				event.preventDefault();
-				me.newArticle(event);
+				var articleToEdit = $("#title").data("article");
+				if(articleToEdit || articleToEdit === x0){
+					me.writeArticle(articleToEdit);	
+				}else{
+					me.writeArticle();
+				}
 			});
 
-			$("#md").on("click", "#sub-edit", function(event){
+			/*$("#md").on("click", "#sub-edit", function(event){
 				event.preventDefault();
-			});
+				var articleToEdit = $("#title").data("article");
+				me.requestJson(me.editArticle, articleToEdit);
+			});*/
 		},
 
-		requestJson: function(callback){
+		requestJson: function(callback, articleToEdit){
 			var me = this;	
 			var jsonRequest = $.ajax(me.localurl + "/menu.json")
 			.done(function(){
-				if (callback){
+				if (callback && articleToEdit){
+					callback.call(me, jsonRequest.responseJSON.menu, articleToEdit);
+				}else if(callback){
 					$("#articles").html("");
-					callback.call(me, jsonRequest.responseJSON.menu);	
+					callback.call(me, jsonRequest.responseJSON.menu);
 				}else{
 					console.log("probably forgot to pass callback");
 					return(jsonRequest.responseJSON.menu);
 				}
 			})
-			.fail(me.errorAjax);
+			.fail(me.errorAjax, (callback)=>{console.log("tout casse",callback);});
 		},
 
 		getArticles: function(menu){
 			this.selectorArticles.html();
+			this.selectorDrop.html();
 			var len = menu.length;
-			var last ='<div class="item">Last articles :</div>'
+			var last ='<div class="item">Last articles :</div>';
+			var option = '<option value="">Edit an article</option>';
 			for(var i = 0; i < len; i++){
 				var url = this.localurl + menu[i].path;
 				var title = menu[i].title;
 				var anchorArticle = "<a class='item link' data-url='" + url + "'>" + title + "</a>";
-				var dropArticle = '<option value="'+url+'">'+title+'</option>';
+				var dropArticle = '<option value="'+i+'">'+title+'</option>';
 				this.selectorDrop.append(dropArticle);
 				this.selectorArticles.append(anchorArticle);
 			}
 			this.selectorArticles.prepend(last);
+			this.selectorDrop.prepend(option);
 		},
 
-		display: function(url, isMarkdown, urlToEdit){
+		display: function(url, isMarkdown, articleToEdit){
 			var me = this;
 			var converter = new showdown.Converter();
 			var jqXHR = $.ajax(url)
@@ -82,30 +98,37 @@
 				if(isMarkdown === true){
 					var convertedToHtml = converter.makeHtml(jqXHR.responseText);
 					me.selectorMD.html(convertedToHtml);
+				}else if (articleToEdit){
+					me.requestJson(me.fillEditForm, articleToEdit);
+					me.selectorMD.html(jqXHR.responseText);
+					me.semanticSettings();
 				}else{
 					me.selectorMD.html(jqXHR.responseText);
-					me.getFormValue(urlToEdit);
 					me.semanticSettings();
 				}
 			})
 			.fail(me.errorAjax);
 		},
 
-		newArticle: function(event){
+		writeArticle: function(articleToEdit){
 			var me = this;
-			var $form = $('#form-new')
-			console.log($('#form-new').form('is valid'));
+			var $form = $('#form')
 			if ($form.form('is valid')){
-				var $form = $('#form-new');
 				var titleArticle =  $form.form('get value', 'title');
 				var contentMd = $form.form('get value', 'text-article');
 				var urlTitle = this.localurl + "/ressources";
+				var toEdit = $("#title").data("article");
+				//tout entre ca et en dessous
+				if (articleToEdit){
+					console.log("dans write", toEdit);
+				}//a delete
 
 				var postForm = $.ajax({
 					method: "POST",
 					url: urlTitle,
-					data: {article: contentMd, title: titleArticle, path: '/' + titleArticle + ".md" },
+					data: {article: contentMd, title: titleArticle, path: '/' + titleArticle + ".md" , articleToEdit: toEdit },
 					success: function(){
+						console.log("dans write ajax");
 						me.greatSuccess(postForm);
 						me.requestJson(me.getArticles);
 					},
@@ -113,15 +136,17 @@
 			}
 		},
 
-		getFormValue: function(urlToEdit){
+		fillEditForm: function(menu, articleToEdit){
 			var me = this;
-			if ($("#form-edit")[0]){
-				var jqXHR = $.ajax(urlToEdit)
-				.done(function(data){
-					$("#text-article").val(data);
-				})
-				.fail(me.errorAjax);
-			}
+			var title = menu[articleToEdit].title;
+			var urlArticle = me.localurl +  menu[articleToEdit].path;
+			var jqXHR = $.ajax(urlArticle)
+			.done(function(data){
+				$("#text-article").val(data);
+				$("#title").val(title);
+				$("#title").data("article",articleToEdit);
+			})
+			.fail(me.errorAjax);
 		},
 
 		semanticSettings: function(){
