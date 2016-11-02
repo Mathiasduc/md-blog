@@ -2,7 +2,7 @@
 	"use strict";
 	var app = {
 
-		localurl: "http://192.168.1.107:8080",
+		localurl: "http://192.168.43.133:8080",
 		selectorMD: $("#md"),
 		selectorArticles: $("#articles"),
 		selectorDrop: $("#edit-drop"),
@@ -41,28 +41,27 @@
 			$("#md").on("click", "#sub", function(event){
 				event.preventDefault();
 				var articleToEdit = $("#title").data("article");
-				if(articleToEdit || articleToEdit === x0){
+				if(articleToEdit || articleToEdit === 0){
 					me.writeArticle(articleToEdit);	
 				}else{
 					me.writeArticle();
 				}
 			});
 
-			/*$("#md").on("click", "#sub-edit", function(event){
-				event.preventDefault();
-				var articleToEdit = $("#title").data("article");
-				me.requestJson(me.editArticle, articleToEdit);
-			});*/
+			$("#drop-list").on("click", "div", function(){
+				var articleNumb = $(this).data("drop_number");
+				console.log(articleNumb);
+				me.requestJson(me.getUrl, articleNumb);
+			});
 		},
 
-		requestJson: function(callback, articleToEdit){
+		requestJson: function(callback, articleNumb){
 			var me = this;	
 			var jsonRequest = $.ajax(me.localurl + "/menu.json")
 			.done(function(){
-				if (callback && articleToEdit){
-					callback.call(me, jsonRequest.responseJSON.menu, articleToEdit);
+				if (callback && articleNumb){
+					callback.call(me, jsonRequest.responseJSON.menu, articleNumb);
 				}else if(callback){
-					$("#articles").html("");
 					callback.call(me, jsonRequest.responseJSON.menu);
 				}else{
 					console.log("probably forgot to pass callback");
@@ -73,18 +72,22 @@
 		},
 
 		getArticles: function(menu){
-			this.selectorArticles.html();
-			this.selectorDrop.html();
+			this.selectorArticles.html("");
+			this.selectorDrop.html("");
+			this.selectorDropList.html("");
 			var len = menu.length;
 			var last ='<div class="item">Last articles :</div>';
 			var option = '<option value="">Edit an article</option>';
+			this.selectorArticles.html("");
 			for(var i = 0; i < len; i++){
 				var url = this.localurl + menu[i].path;
 				var title = menu[i].title;
 				var anchorArticle = "<a class='item link' data-url='" + url + "'>" + title + "</a>";
 				var dropArticle = '<option value="'+i+'">'+title+'</option>';
+				var item = '<div class="item" data-drop_number="'+ i +'">'+ title +'</div>';
 				this.selectorDrop.append(dropArticle);
 				this.selectorArticles.append(anchorArticle);
+				this.selectorDropList.append(item);
 			}
 			this.selectorArticles.prepend(last);
 			this.selectorDrop.prepend(option);
@@ -110,6 +113,12 @@
 			.fail(me.errorAjax);
 		},
 
+		getUrl: function(menu, articleNumb){
+			var url =  this.localurl + menu[articleNumb].path;
+			console.log(url);
+			this.display(url, true);
+		},
+
 		writeArticle: function(articleToEdit){
 			var me = this;
 			var $form = $('#form')
@@ -117,16 +126,16 @@
 				var titleArticle =  $form.form('get value', 'title');
 				var contentMd = $form.form('get value', 'text-article');
 				var urlTitle = this.localurl + "/ressources";
-				var toEdit = $("#title").data("article");
-				//tout entre ca et en dessous
 				if (articleToEdit){
-					console.log("dans write", toEdit);
-				}//a delete
-
+					var bodyRequest = {article: contentMd, title: titleArticle, path: $("#title").data("path") , articleToEdit: articleToEdit};
+				}else{
+					var bodyRequest = {article: contentMd, title: titleArticle, path: '/' + titleArticle + ".md" , articleToEdit: toEdit };
+				}
+				console.log(bodyRequest);
 				var postForm = $.ajax({
 					method: "POST",
 					url: urlTitle,
-					data: {article: contentMd, title: titleArticle, path: '/' + titleArticle + ".md" , articleToEdit: toEdit },
+					data: bodyRequest,
 					success: function(){
 						console.log("dans write ajax");
 						me.greatSuccess(postForm);
@@ -145,6 +154,7 @@
 				$("#text-article").val(data);
 				$("#title").val(title);
 				$("#title").data("article",articleToEdit);
+				$("#title").data("path",menu[articleToEdit].path);
 			})
 			.fail(me.errorAjax);
 		},
