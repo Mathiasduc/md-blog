@@ -16,6 +16,7 @@
 		},
 
 		//mettre un SLUG!!!<<<<-----------------------
+		//on peut spam creer ?
 		//verif si bel et bien eu modif avant de post?
 		//ameliorer le menu.json pour inclure last edit, created at,
 		//is protected;
@@ -180,6 +181,7 @@
 			.done(function(data){
 				me.getArticles(data.menu);
 				me.greatSuccess(postForm);
+				me.displayLandingPage();
 			})
 			.fail(me.errorAjax);
 		},
