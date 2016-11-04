@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var meth = require('./methods.js');
+var $ = require('jquery');
 
 var jsonParser = bodyParser.json();
 var textParser = bodyParser.text();
@@ -23,7 +24,7 @@ app.use(function(err, req, res, next) {
 
 app.get('/', function(req, res){
 	console.log("test");
-    res.sendFile('index.html');
+	res.sendFile('index.html');
 });
 
 app.post('/ressources',jsonParser, function (req, res) {
@@ -33,10 +34,22 @@ app.post('/ressources',jsonParser, function (req, res) {
 		if(err){
 			console.log(err);
 		}else{
-			meth.updateJson(req.body.title, req.body.path, req.body.articleToEdit);
-			res.sendStatus(200);
+			meth.updateJson(req.body.title, req.body.path, req.body.articleToEdit,function(toSend){
+				res.json(toSend);
+			});	
 		}
 	});
+});
+
+app.post('/delete',jsonParser, function (req, res) {
+	if (!req.body) {return res.sendStatus(400);}
+	console.log("delete: \n",ressourcesPath + req.body.path);
+	var filePath = ressourcesPath + req.body.path;
+	fs.unlink(filePath);
+	var responseMenu = "may not be my object";
+	meth.updateJson(req.body.title, req.body.path, req.body.articleToDelete,function(toSend){
+		res.json(toSend);
+	});		
 });
 
 app.listen(8080);

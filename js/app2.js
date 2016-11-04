@@ -2,7 +2,7 @@
 	"use strict";
 	var app = {
 
-		localurl: "http://192.168.1.107:8080",
+		localurl: "http://192.168.43.133:8080",
 		selectorMD: $("#md"),
 		selectorArticles: $("#articles"),
 		selectorDrop: $("#edit-drop"),
@@ -10,16 +10,13 @@
 
 		init:function(){
 			this.requestJson(this.getArticles);
-			this.displayLandingPage();
 			this.listeners();
 			this.semanticSettings();
 		},
 
-		//mettre un SLUG!!!<<<<-----------------------
+		//UN SLUG!!!<<<<-----------------------
 		//verif si bel et bien eu modif avant de post?
-		//ameliorer le menu.json pour inclure last edit, created at,
-		//is protected;
-		//implementer le tri par date , par modif
+		//delete un article
 
 		listeners: function(){
 			var me = this;
@@ -36,8 +33,6 @@
 			$("#edit-button").on("click", function(){
 				var formUrl = $(this).data("url");
 				var articleToEdit = $(".search.dropdown .selected").data("value")
-				console.log(articleToEdit);
-
 				if(articleToEdit){
 					me.display(formUrl, false, articleToEdit);
 				}
@@ -46,28 +41,16 @@
 			$("#md").on("click", "#sub", function(event){
 				event.preventDefault();
 				var articleToEdit = $("#title").data("article");
-				console.log(articleToEdit,"articleToEdit");
-				if(parseInt(articleToEdit, 10) <= 3){
-					me.protectedArticle();	
-				}else if(articleToEdit){
-					me.writeArticle(articleToEdit);
+				if(articleToEdit || articleToEdit === 0){
+					me.writeArticle(articleToEdit);	
 				}else{
 					me.writeArticle();
 				}
 			});
 
-			$("#md").on("click", "#sub-delete", function(event){
-				event.preventDefault();
-				var articleToDelete = $("#title").data("article");
-				if(parseInt(articleToDelete, 10) <= 3){
-					me.protectedArticle();
-				}else{
-					me.deleteArticle(articleToDelete);
-				}
-			}),
-
 			$("#drop-list").on("click", "div", function(){
 				var articleNumb = $(this).data("drop_number");
+				console.log(articleNumb);
 				me.requestJson(me.getUrl, articleNumb);
 			});
 		},
@@ -85,8 +68,8 @@
 					return(jsonRequest.responseJSON.menu);
 				}
 			})
-			.fail(me.errorAjax, (callback)=>{console.log("requestJson err, callback:",callback);});
-		},	
+			.fail(me.errorAjax, (callback)=>{console.log("tout casse",callback);});
+		},
 
 		getArticles: function(menu){
 			this.selectorArticles.html("");
@@ -130,58 +113,36 @@
 			.fail(me.errorAjax);
 		},
 
-		displayLandingPage: function(){
-			var me = this;
-			var jqXHR = $.ajax(me.localurl + "/default.html")
-			.done(function(page){
-				me.selectorMD.html(page);
-			})
-			.fail(me.errorAjax)
-		},
-
 		getUrl: function(menu, articleNumb){
 			var url =  this.localurl + menu[articleNumb].path;
+			console.log(url);
 			this.display(url, true);
 		},
 
-		//if articleToEdit is true, post request will edit article 
 		writeArticle: function(articleToEdit){
 			var me = this;
 			var $form = $('#form')
 			if ($form.form('is valid')){
 				var titleArticle =  $form.form('get value', 'title');
 				var contentMd = $form.form('get value', 'text-article');
-				var url = this.localurl + "/ressources";
+				var urlTitle = this.localurl + "/ressources";
 				if (articleToEdit){
 					var bodyRequest = {article: contentMd, title: titleArticle, path: $("#title").data("path") , articleToEdit: articleToEdit};
 				}else{
-					var bodyRequest = {article: contentMd, title: titleArticle, path: '/' + titleArticle + ".md" , articleToEdit: articleToEdit };
+					var bodyRequest = {article: contentMd, title: titleArticle, path: '/' + titleArticle + ".md" , articleToEdit: toEdit };
 				}
 				console.log(bodyRequest);
 				var postForm = $.ajax({
 					method: "POST",
-					url: url,
-					data: bodyRequest})
-				.done(function(data){
-					me.getArticles(data.menu);
-					me.greatSuccess(postForm);
-				})
-				.fail(me.errorAjax);
+					url: urlTitle,
+					data: bodyRequest,
+					success: function(){
+						console.log("dans write ajax");
+						me.greatSuccess(postForm);
+						me.requestJson(me.getArticles);
+					},
+				});
 			}
-		},
-
-		deleteArticle: function(articleToDelete){
-			var me = this;
-			var postForm = $.ajax({
-				method: "POST",
-				url: me.localurl + "/delete",
-				data: {path: $("#title").data("path"), articleToDelete: articleToDelete},
-			})
-			.done(function(data){
-				me.getArticles(data.menu);
-				me.greatSuccess(postForm);
-			})
-			.fail(me.errorAjax);
 		},
 
 		fillEditForm: function(menu, articleToEdit){
@@ -229,21 +190,11 @@
 			});
 		},
 
-		correctlyEdited:function(){
-			//animation css for confirming editing
-		},
-
-		protectedArticle: function(){
-			alert("article is protected, cannot delete");
-			console.long("article is protected, cannot delete");
-			//css animation for replacing alert
-		},
-
-		error: function(errMessage){console.log("In error method, something went wrong, message: ", errMessage);},
-
 		errorAjax: function(){console.log("In fail method, something went wrong");},
 
-		greatSuccess: function(jqXHR){console.log(jqXHR,"greatSuccess")},
+		greatSuccess: function(jqXHR){
+			console.log(jqXHR,"greatSuccess")
+		},
 	};
 
 	$(document).ready(function(){
