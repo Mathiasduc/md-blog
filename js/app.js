@@ -2,7 +2,7 @@
 	"use strict";
 	var app = {
 
-		localurl: "http://192.168.1.107:8080",
+		localurl: "http://88.160.12.89:8080",
 		selectorMD: $("#md"),
 		selectorArticles: $("#articles"),
 		selectorDrop: $("#edit-drop"),
